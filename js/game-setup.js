@@ -21,10 +21,20 @@ class GameSetupManager {
 
     async loadData() {
         try {
-            const setupsData = await sheetsAPI.readSheet(CONFIG.SHEETS.GAME_SETUPS);
+            let setupsData = [];
+            if (typeof sheetsAPI !== 'undefined' && sheetsAPI) {
+                setupsData = await sheetsAPI.readSheet(CONFIG.SHEETS.GAME_SETUPS);
+            } else {
+                setupsData = JSON.parse(localStorage.getItem('sheet_' + (CONFIG.SHEETS.GAME_SETUPS || 'GAME_SETUPS')) || '[]');
+            }
             this.processGameSetups(setupsData);
 
-            const sportsData = await sheetsAPI.readSheet(CONFIG.SHEETS.SPORTS);
+            let sportsData = [];
+            if (typeof sheetsAPI !== 'undefined' && sheetsAPI) {
+                sportsData = await sheetsAPI.readSheet(CONFIG.SHEETS.SPORTS);
+            } else {
+                sportsData = JSON.parse(localStorage.getItem('sheet_' + (CONFIG.SHEETS.SPORTS || 'SPORTS')) || '[]');
+            }
             this.processSports(sportsData);
 
             this.updateSportFilters();
@@ -141,20 +151,41 @@ class GameSetupManager {
         try {
             showLoading();
 
-            await sheetsAPI.appendSheet(CONFIG.SHEETS.GAME_SETUPS, [
-                formData.id,
-                formData.name,
-                formData.sport,
-                formData.teamSize,
-                formData.duration,
-                formData.halves,
-                formData.substitutes,
-                formData.requiredUmpires,
-                formData.rules,
-                formData.winPoints,
-                formData.drawPoints,
-                formData.lossPoints
-            ]);
+
+            if (typeof sheetsAPI !== 'undefined' && sheetsAPI) {
+                await sheetsAPI.appendSheet(CONFIG.SHEETS.GAME_SETUPS, [
+                    formData.id,
+                    formData.name,
+                    formData.sport,
+                    formData.teamSize,
+                    formData.duration,
+                    formData.halves,
+                    formData.substitutes,
+                    formData.requiredUmpires,
+                    formData.rules,
+                    formData.winPoints,
+                    formData.drawPoints,
+                    formData.lossPoints
+                ]);
+            } else {
+                const key = 'sheet_' + (CONFIG.SHEETS.GAME_SETUPS || 'GAME_SETUPS');
+                const existing = JSON.parse(localStorage.getItem(key) || '[]');
+                existing.push([
+                    formData.id,
+                    formData.name,
+                    formData.sport,
+                    formData.teamSize,
+                    formData.duration,
+                    formData.halves,
+                    formData.substitutes,
+                    formData.requiredUmpires,
+                    formData.rules,
+                    formData.winPoints,
+                    formData.drawPoints,
+                    formData.lossPoints
+                ]);
+                localStorage.setItem(key, JSON.stringify(existing));
+            }
 
             this.gameSetups.push(formData);
             this.allGameSetups.push(formData);

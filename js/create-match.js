@@ -43,16 +43,31 @@ class CreateMatchManager {
     async loadData() {
         try {
             // Load teams
-            const teamsData = await sheetsAPI.readSheet(CONFIG.SHEETS.TEAMS);
+            let teamsData = [];
+            if (typeof sheetsAPI !== 'undefined' && sheetsAPI) {
+                teamsData = await sheetsAPI.readSheet(CONFIG.SHEETS.TEAMS);
+            } else {
+                teamsData = JSON.parse(localStorage.getItem('sheet_' + (CONFIG.SHEETS.TEAMS || 'TEAMS')) || '[]');
+            }
             this.processTeams(teamsData);
             this.filterTeamsByRegion();
 
             // Load sports
-            const sportsData = await sheetsAPI.readSheet(CONFIG.SHEETS.SPORTS);
+            let sportsData = [];
+            if (typeof sheetsAPI !== 'undefined' && sheetsAPI) {
+                sportsData = await sheetsAPI.readSheet(CONFIG.SHEETS.SPORTS);
+            } else {
+                sportsData = JSON.parse(localStorage.getItem('sheet_' + (CONFIG.SHEETS.SPORTS || 'SPORTS')) || '[]');
+            }
             this.processSports(sportsData);
 
             // Load umpires
-            const umpiresData = await sheetsAPI.readSheet(CONFIG.SHEETS.UMPIRES);
+            let umpiresData = [];
+            if (typeof sheetsAPI !== 'undefined' && sheetsAPI) {
+                umpiresData = await sheetsAPI.readSheet(CONFIG.SHEETS.UMPIRES);
+            } else {
+                umpiresData = JSON.parse(localStorage.getItem('sheet_' + (CONFIG.SHEETS.UMPIRES || 'UMPIRES')) || '[]');
+            }
             this.processUmpires(umpiresData);
 
             this.updateSelects();
@@ -313,20 +328,40 @@ class CreateMatchManager {
         try {
             showLoading();
 
-            await sheetsAPI.appendSheet(CONFIG.SHEETS.MATCHES, [
-                formData.id,
-                formData.date,
-                formData.time,
-                formData.sport,
-                formData.homeTeam,
-                formData.awayTeam,
-                formData.location,
-                formData.status,
-                formData.homeScore,
-                formData.awayScore,
-                formData.umpires,
-                formData.notes
-            ]);
+            if (typeof sheetsAPI !== 'undefined' && sheetsAPI) {
+                await sheetsAPI.appendSheet(CONFIG.SHEETS.MATCHES, [
+                    formData.id,
+                    formData.date,
+                    formData.time,
+                    formData.sport,
+                    formData.homeTeam,
+                    formData.awayTeam,
+                    formData.location,
+                    formData.status,
+                    formData.homeScore,
+                    formData.awayScore,
+                    formData.umpires,
+                    formData.notes
+                ]);
+            } else {
+                const key = 'sheet_' + (CONFIG.SHEETS.MATCHES || 'MATCHES');
+                const existing = JSON.parse(localStorage.getItem(key) || '[]');
+                existing.push([
+                    formData.id,
+                    formData.date,
+                    formData.time,
+                    formData.sport,
+                    formData.homeTeam,
+                    formData.awayTeam,
+                    formData.location,
+                    formData.status,
+                    formData.homeScore,
+                    formData.awayScore,
+                    formData.umpires,
+                    formData.notes
+                ]);
+                localStorage.setItem(key, JSON.stringify(existing));
+            }
 
             showToast('Match created successfully!', 'success');
             

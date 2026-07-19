@@ -22,10 +22,20 @@ class TeamRegistrationManager {
 
     async loadData() {
         try {
-            const teamsData = await sheetsAPI.readSheet(CONFIG.SHEETS.TEAMS);
+            let teamsData = [];
+            if (typeof sheetsAPI !== 'undefined' && sheetsAPI) {
+                teamsData = await sheetsAPI.readSheet(CONFIG.SHEETS.TEAMS);
+            } else {
+                teamsData = JSON.parse(localStorage.getItem('sheet_' + (CONFIG.SHEETS.TEAMS || 'TEAMS')) || '[]');
+            }
             this.processTeams(teamsData);
 
-            const sportsData = await sheetsAPI.readSheet(CONFIG.SHEETS.SPORTS);
+            let sportsData = [];
+            if (typeof sheetsAPI !== 'undefined' && sheetsAPI) {
+                sportsData = await sheetsAPI.readSheet(CONFIG.SHEETS.SPORTS);
+            } else {
+                sportsData = JSON.parse(localStorage.getItem('sheet_' + (CONFIG.SHEETS.SPORTS || 'SPORTS')) || '[]');
+            }
             this.processSports(sportsData);
 
             this.updateSportFilters();
@@ -198,17 +208,34 @@ class TeamRegistrationManager {
         try {
             showLoading();
 
-            await sheetsAPI.appendSheet(CONFIG.SHEETS.TEAMS, [
-                formData.id,
-                formData.name,
-                formData.sport,
-                formData.location,
-                formData.manager,
-                formData.managerEmail,
-                formData.managerPhone,
-                formData.playerCount,
-                formData.description
-            ]);
+            if (typeof sheetsAPI !== 'undefined' && sheetsAPI) {
+                await sheetsAPI.appendSheet(CONFIG.SHEETS.TEAMS, [
+                    formData.id,
+                    formData.name,
+                    formData.sport,
+                    formData.location,
+                    formData.manager,
+                    formData.managerEmail,
+                    formData.managerPhone,
+                    formData.playerCount,
+                    formData.description
+                ]);
+            } else {
+                const key = 'sheet_' + (CONFIG.SHEETS.TEAMS || 'TEAMS');
+                const existing = JSON.parse(localStorage.getItem(key) || '[]');
+                existing.push([
+                    formData.id,
+                    formData.name,
+                    formData.sport,
+                    formData.location,
+                    formData.manager,
+                    formData.managerEmail,
+                    formData.managerPhone,
+                    formData.playerCount,
+                    formData.description
+                ]);
+                localStorage.setItem(key, JSON.stringify(existing));
+            }
 
             this.teams.push(formData);
             this.allTeams.push(formData);

@@ -29,7 +29,7 @@
                     <li><a href="owner.html">Owner Portal</a></li>
                     <li><a href="cloudflare-integration.html">Cloudflare Setup</a></li>
                     <li class="admin-nav-link" style="display:none"><a href="users.html">User Management</a></li>
-                    <li class="admin-nav-link" style="display:none"><a href="admin-test.html">Sheets Test</a></li>
+                    
                 </ul>
             </nav>
 
@@ -105,18 +105,6 @@
 
                     <div style="margin-top: 20px; display:flex; gap:10px; flex-wrap:wrap;">
                         <a href="users.html" class="btn-primary">User Management</a>
-                        <a href="admin-test.html" class="btn-secondary">Open Admin Sheets Tester</a>
-                    </div>
-
-                    <div id="adminSheetTestSection" class="admin-sheet-test-section">
-                        <h3>🧪 Google Sheets Test</h3>
-                        <div class="admin-test-actions">
-                            <button type="button" class="btn-primary" onclick="dashboard.runSheetMetadataTest()">Test Connection</button>
-                            <button type="button" class="btn-secondary" onclick="dashboard.runSheetReadTest()">Read Users Sheet</button>
-                            <button type="button" class="btn-secondary" onclick="dashboard.runSheetAppendTest()">Append Test Row</button>
-                            <button type="button" class="btn-secondary" onclick="dashboard.clearSheetTestOutput()">Clear Output</button>
-                        </div>
-                        <div id="sheetTestOutput" class="sheet-test-output">Use these buttons to test Google Sheets connectivity and operations.</div>
                     </div>
                 </section>
 
@@ -132,7 +120,6 @@
     </div>
 
     <script src="config.js"></script>
-    <script src="js/google-sheets-api.js"></script>
     <script src="js/utils.js"></script>
     <script src="js/dashboard.js"></script>
 </body>

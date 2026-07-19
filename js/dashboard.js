@@ -92,8 +92,11 @@ class Dashboard {
      */
     async loadData() {
         try {
-            // Load matches
-            const matchesData = await sheetsAPI.readSheet(CONFIG.SHEETS.MATCHES);
+            // Load matches (use Sheets if available)
+            let matchesData = [];
+            if (typeof sheetsAPI !== 'undefined' && sheetsAPI) {
+                matchesData = await sheetsAPI.readSheet(CONFIG.SHEETS.MATCHES);
+            }
             await this.processMatches(matchesData);
 
             // Load stats for managers and admins
@@ -159,13 +162,19 @@ class Dashboard {
     async loadManagerStats() {
         try {
             // Load teams
-            const teamsData = await sheetsAPI.readSheet(CONFIG.SHEETS.TEAMS);
+            let teamsData = [];
+            if (typeof sheetsAPI !== 'undefined' && sheetsAPI) {
+                teamsData = await sheetsAPI.readSheet(CONFIG.SHEETS.TEAMS);
+            }
             if (teamsData && teamsData.length > 1) {
                 this.stats.registeredTeams = teamsData.length - 1;
             }
 
             // Load umpires
-            const umpiresData = await sheetsAPI.readSheet(CONFIG.SHEETS.UMPIRES);
+            let umpiresData = [];
+            if (typeof sheetsAPI !== 'undefined' && sheetsAPI) {
+                umpiresData = await sheetsAPI.readSheet(CONFIG.SHEETS.UMPIRES);
+            }
             if (umpiresData && umpiresData.length > 1) {
                 this.stats.availableUmpires = umpiresData.length - 1;
             }
@@ -182,14 +191,20 @@ class Dashboard {
     async loadAdminStats() {
         try {
             // Load teams
-            const teamsData = await sheetsAPI.readSheet(CONFIG.SHEETS.TEAMS);
+            let teamsData = [];
+            if (typeof sheetsAPI !== 'undefined' && sheetsAPI) {
+                teamsData = await sheetsAPI.readSheet(CONFIG.SHEETS.TEAMS);
+            }
             if (teamsData && teamsData.length > 1) {
                 this.stats.registeredTeams = teamsData.length - 1;
                 this.renderAdminTeamsSection(teamsData.slice(1));
             }
 
             // Load umpires
-            const umpiresData = await sheetsAPI.readSheet(CONFIG.SHEETS.UMPIRES);
+            let umpiresData = [];
+            if (typeof sheetsAPI !== 'undefined' && sheetsAPI) {
+                umpiresData = await sheetsAPI.readSheet(CONFIG.SHEETS.UMPIRES);
+            }
             if (umpiresData && umpiresData.length > 1) {
                 this.stats.availableUmpires = umpiresData.length - 1;
                 this.renderAdminUmpiresSection(umpiresData.slice(1));

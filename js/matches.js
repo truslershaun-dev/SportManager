@@ -48,19 +48,39 @@ class MatchesManager {
     async loadData() {
         try {
             // Load matches
-            const matchesData = await sheetsAPI.readSheet(CONFIG.SHEETS.MATCHES);
+            let matchesData = [];
+            if (typeof sheetsAPI !== 'undefined' && sheetsAPI) {
+                matchesData = await sheetsAPI.readSheet(CONFIG.SHEETS.MATCHES);
+            } else {
+                matchesData = JSON.parse(localStorage.getItem('sheet_' + (CONFIG.SHEETS.MATCHES || 'MATCHES')) || '[]');
+            }
             this.processMatches(matchesData);
 
             // Load sports
-            const sportsData = await sheetsAPI.readSheet(CONFIG.SHEETS.SPORTS);
+            let sportsData = [];
+            if (typeof sheetsAPI !== 'undefined' && sheetsAPI) {
+                sportsData = await sheetsAPI.readSheet(CONFIG.SHEETS.SPORTS);
+            } else {
+                sportsData = JSON.parse(localStorage.getItem('sheet_' + (CONFIG.SHEETS.SPORTS || 'SPORTS')) || '[]');
+            }
             this.processSports(sportsData);
 
             // Load teams for manager matching
-            const teamsData = await sheetsAPI.readSheet(CONFIG.SHEETS.TEAMS);
+            let teamsData = [];
+            if (typeof sheetsAPI !== 'undefined' && sheetsAPI) {
+                teamsData = await sheetsAPI.readSheet(CONFIG.SHEETS.TEAMS);
+            } else {
+                teamsData = JSON.parse(localStorage.getItem('sheet_' + (CONFIG.SHEETS.TEAMS || 'TEAMS')) || '[]');
+            }
             this.processTeams(teamsData);
 
             // Load umpires
-            const umpiresData = await sheetsAPI.readSheet(CONFIG.SHEETS.UMPIRES);
+            let umpiresData = [];
+            if (typeof sheetsAPI !== 'undefined' && sheetsAPI) {
+                umpiresData = await sheetsAPI.readSheet(CONFIG.SHEETS.UMPIRES);
+            } else {
+                umpiresData = JSON.parse(localStorage.getItem('sheet_' + (CONFIG.SHEETS.UMPIRES || 'UMPIRES')) || '[]');
+            }
             this.processUmpires(umpiresData);
 
             this.filterMatchesForCurrentUser();

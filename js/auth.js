@@ -23,31 +23,22 @@ class AuthManager {
      * Initialize authentication
      */
     async init() {
-        // Load users from sheets
+        // Load users from localStorage (Cloudflare API handles auth in cloud mode)
         try {
-            const usersData = await sheetsAPI.readSheet(CONFIG.SHEETS.USERS);
-            if (usersData && usersData.length > 1) {
-                // Skip header row - but preserve admin account
-                const sheetUsers = usersData.slice(1).map(row => ({
-                    id: row[0],
-                    email: row[1],
-                    name: row[2],
-                    userType: row[3],
-                    phone: row[4],
-                    location: row[5],
-                    createdAt: row[6]
-                }));
-                
-                // Merge sheet users with seeded admin account
-                const adminUser = this.users.find(u => u.email === 'admin@sportmanager.com');
-                this.users = [...sheetUsers];
-                if (adminUser) {
-                    this.users.unshift(adminUser);
+            const stored = localStorage.getItem('app_users');
+            if (stored) {
+                const parsed = JSON.parse(stored);
+                if (Array.isArray(parsed) && parsed.length > 0) {
+                    // Ensure seeded admin is present
+                    const adminUser = this.users.find(u => u.email === 'admin@sportmanager.com');
+                    this.users = parsed;
+                    if (adminUser && !this.users.find(u => u.email === adminUser.email)) {
+                        this.users.unshift(adminUser);
+                    }
                 }
             }
         } catch (error) {
-            console.error('Error loading users:', error);
-            // If sheet loading fails, at least keep the admin account
+            console.error('Error loading users from localStorage:', error);
         }
     }
 
@@ -95,20 +86,10 @@ class AuthManager {
             roleTier: roleTier || ''
         };
 
-        // Save to sheets
+        // Persist user to localStorage (or rely on Cloudflare API in cloud mode)
         try {
-            await sheetsAPI.appendSheet(CONFIG.SHEETS.USERS, [
-                userId,
-                email,
-                name,
-                userType,
-                '',
-                '',
-                new Date().toISOString(),
-                roleTier || ''
-            ]);
-
             this.users.push(newUser);
+            localStorage.setItem('app_users', JSON.stringify(this.users));
             return { success: true, user: newUser };
         } catch (error) {
             console.error('Error creating user:', error);

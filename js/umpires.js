@@ -29,10 +29,20 @@ class UmpiresManager {
      */
     async loadData() {
         try {
-            const umpiresData = await sheetsAPI.readSheet(CONFIG.SHEETS.UMPIRES);
+            let umpiresData = [];
+            if (typeof sheetsAPI !== 'undefined' && sheetsAPI) {
+                umpiresData = await sheetsAPI.readSheet(CONFIG.SHEETS.UMPIRES);
+            } else {
+                umpiresData = JSON.parse(localStorage.getItem('sheet_' + (CONFIG.SHEETS.UMPIRES || 'UMPIRES')) || '[]');
+            }
             this.processUmpires(umpiresData);
 
-            const sportsData = await sheetsAPI.readSheet(CONFIG.SHEETS.SPORTS);
+            let sportsData = [];
+            if (typeof sheetsAPI !== 'undefined' && sheetsAPI) {
+                sportsData = await sheetsAPI.readSheet(CONFIG.SHEETS.SPORTS);
+            } else {
+                sportsData = JSON.parse(localStorage.getItem('sheet_' + (CONFIG.SHEETS.SPORTS || 'SPORTS')) || '[]');
+            }
             this.processSports(sportsData);
 
             this.updateFilters();
@@ -423,20 +433,40 @@ class UmpiresManager {
         try {
             showLoading();
 
-            await sheetsAPI.appendSheet(CONFIG.SHEETS.UMPIRES, [
-                formData.id,
-                formData.name,
-                formData.email,
-                formData.phone,
-                formData.age,
-                formData.rank,
-                formData.location,
-                formData.region,
-                formData.sports.join(','),
-                formData.availableDays.join(','),
-                formData.preferredTimes.join(','),
-                formData.rating
-            ]);
+            if (typeof sheetsAPI !== 'undefined' && sheetsAPI) {
+                await sheetsAPI.appendSheet(CONFIG.SHEETS.UMPIRES, [
+                    formData.id,
+                    formData.name,
+                    formData.email,
+                    formData.phone,
+                    formData.age,
+                    formData.rank,
+                    formData.location,
+                    formData.region,
+                    formData.sports.join(','),
+                    formData.availableDays.join(','),
+                    formData.preferredTimes.join(','),
+                    formData.rating
+                ]);
+            } else {
+                const key = 'sheet_' + (CONFIG.SHEETS.UMPIRES || 'UMPIRES');
+                const existing = JSON.parse(localStorage.getItem(key) || '[]');
+                existing.push([
+                    formData.id,
+                    formData.name,
+                    formData.email,
+                    formData.phone,
+                    formData.age,
+                    formData.rank,
+                    formData.location,
+                    formData.region,
+                    formData.sports.join(','),
+                    formData.availableDays.join(','),
+                    formData.preferredTimes.join(','),
+                    formData.rating
+                ]);
+                localStorage.setItem(key, JSON.stringify(existing));
+            }
 
             this.umpires.push(formData);
             this.allUmpires.push(formData);

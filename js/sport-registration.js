@@ -20,7 +20,12 @@ class SportRegistrationManager {
 
     async loadData() {
         try {
-            const sportsData = await sheetsAPI.readSheet(CONFIG.SHEETS.SPORTS);
+            let sportsData = [];
+            if (typeof sheetsAPI !== 'undefined' && sheetsAPI) {
+                sportsData = await sheetsAPI.readSheet(CONFIG.SHEETS.SPORTS);
+            } else {
+                sportsData = JSON.parse(localStorage.getItem('sheet_' + (CONFIG.SHEETS.SPORTS || 'SPORTS')) || '[]');
+            }
             this.processSports(sportsData);
         } catch (error) {
             console.error('Error loading sports data:', error);
@@ -142,21 +147,43 @@ class SportRegistrationManager {
         try {
             showLoading();
 
-            await sheetsAPI.appendSheet(CONFIG.SHEETS.SPORTS, [
-                formData.id,
-                formData.name,
-                formData.category,
-                formData.description,
-                formData.teamSize,
-                formData.duration,
-                formData.requiredUmpires,
-                formData.winPoints,
-                formData.drawPoints,
-                formData.lossPoints,
-                formData.minAge,
-                formData.maxAge,
-                formData.regions
-            ]);
+
+            if (typeof sheetsAPI !== 'undefined' && sheetsAPI) {
+                await sheetsAPI.appendSheet(CONFIG.SHEETS.SPORTS, [
+                    formData.id,
+                    formData.name,
+                    formData.category,
+                    formData.description,
+                    formData.teamSize,
+                    formData.duration,
+                    formData.requiredUmpires,
+                    formData.winPoints,
+                    formData.drawPoints,
+                    formData.lossPoints,
+                    formData.minAge,
+                    formData.maxAge,
+                    formData.regions
+                ]);
+            } else {
+                const key = 'sheet_' + (CONFIG.SHEETS.SPORTS || 'SPORTS');
+                const existing = JSON.parse(localStorage.getItem(key) || '[]');
+                existing.push([
+                    formData.id,
+                    formData.name,
+                    formData.category,
+                    formData.description,
+                    formData.teamSize,
+                    formData.duration,
+                    formData.requiredUmpires,
+                    formData.winPoints,
+                    formData.drawPoints,
+                    formData.lossPoints,
+                    formData.minAge,
+                    formData.maxAge,
+                    formData.regions
+                ]);
+                localStorage.setItem(key, JSON.stringify(existing));
+            }
 
             this.sports.push(formData);
             this.allSports.push(formData);

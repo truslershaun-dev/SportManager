@@ -55,10 +55,20 @@ class ProfileManager {
 
     async loadData() {
         try {
-            const sportsData = await sheetsAPI.readSheet(CONFIG.SHEETS.SPORTS);
+            let sportsData = [];
+            if (typeof sheetsAPI !== 'undefined' && sheetsAPI) {
+                sportsData = await sheetsAPI.readSheet(CONFIG.SHEETS.SPORTS);
+            } else {
+                sportsData = JSON.parse(localStorage.getItem('sheet_' + (CONFIG.SHEETS.SPORTS || 'SPORTS')) || '[]');
+            }
             this.processSports(sportsData);
 
-            const teamsData = await sheetsAPI.readSheet(CONFIG.SHEETS.TEAMS);
+            let teamsData = [];
+            if (typeof sheetsAPI !== 'undefined' && sheetsAPI) {
+                teamsData = await sheetsAPI.readSheet(CONFIG.SHEETS.TEAMS);
+            } else {
+                teamsData = JSON.parse(localStorage.getItem('sheet_' + (CONFIG.SHEETS.TEAMS || 'TEAMS')) || '[]');
+            }
             this.processTeams(teamsData);
 
             this.updateTeamSelects();
