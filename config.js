@@ -23,7 +23,9 @@ const CONFIG = {
     APP_NAME: 'Sport Manager',
     APP_VERSION: '1.0.0',
     
-    CLOUDFLARE_API_URL: '',
+    // Use '/api' for Cloudflare Pages Functions deployments.
+    // Replace with the full Worker URL if you deploy a standalone Worker instead.
+    CLOUDFLARE_API_URL: '/api',
     
     // Date/Time Settings
     DATE_FORMAT: 'MMM DD, YYYY',

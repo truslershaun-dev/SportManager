@@ -1,0 +1,11 @@
+{
+  "name": "sportmanager-pages",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "deploy:pages": "wrangler pages deploy . --project-name=sportmanager"
+  },
+  "devDependencies": {
+    "wrangler": "^4.25.0"
+  }
+}

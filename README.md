@@ -247,7 +247,7 @@ Follow these steps to connect the Cloudflare D1 database to the website pages.
 
 6. Set the API URL in the frontend.
    - Open [config.js](config.js).
-   - Set `CLOUDFLARE_API_URL` to the deployed Worker URL.
+   - Set `CLOUDFLARE_API_URL` to the deployed Worker URL. If you deploy via Cloudflare Pages with Functions, set the API URL to the Pages site root (e.g. `https://<your-site>.pages.dev/api`).
 
 7. Test the connection.
    - Open the site and log in.

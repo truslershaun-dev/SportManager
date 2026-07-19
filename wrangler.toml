@@ -1,0 +1,7 @@
+name = "sportmanager"
+compatibility_date = "2025-01-01"
+pages_build_output_dir = "./"
+
+[[d1_databases]]
+binding = "D1"
+database_name = "sportmanager_db"

@@ -16,3 +16,7 @@ database_name = "sportmanager_db"
 
 [triggers]
 crons = ["0 */6 * * *"]
+# Pages Functions mapping (not required by Wrangler but documented for Pages deployments)
+# The `functions/` directory at the repository root contains Cloudflare Pages Functions
+# that implement the API at the path `/api/*`.
+# When deploying to Pages, ensure the Pages build configuration includes `functions` as the Functions directory.
