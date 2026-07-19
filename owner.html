@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Owner Portal - Sport Manager</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2>Sport Manager</h2>
+            </div>
+            <nav class="sidebar-nav">
+                <ul>
+                    <li><a href="dashboard.html">Dashboard</a></li>
+                    <li><a href="matches.html">Matches</a></li>
+                    <li><a href="profile.html">Profile</a></li>
+                    <li><a href="owner.html" class="active">Owner Portal</a></li>
+                    <li><a href="cloudflare-integration.html">Cloudflare Setup</a></li>
+                </ul>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <header class="top-bar">
+                <h1>Owner Portal</h1>
+            </header>
+
+            <div class="profile-container">
+                <section>
+                    <h2>Licence Levels</h2>
+                    <p>Owners manage organisations, subscription licences, and sport/team limits for their organisation.</p>
+                    <div class="license-grid">
+                        <div class="license-card">
+                            <h3>Level 1</h3>
+                            <p>1 sport with up to 5 teams</p>
+                        </div>
+                        <div class="license-card">
+                            <h3>Level 2</h3>
+                            <p>5 sports with up to 5 teams</p>
+                        </div>
+                        <div class="license-card">
+                            <h3>Level 3</h3>
+                            <p>10 sports with up to 20 teams</p>
+                        </div>
+                        <div class="license-card">
+                            <h3>Level 4</h3>
+                            <p>10 sports with unlimited teams</p>
+                        </div>
+                        <div class="license-card">
+                            <h3>Level 5</h3>
+                            <p>Unlimited sports and unlimited teams</p>
+                        </div>
+                    </div>
+                </section>
+
+                <section style="margin-top: 30px;">
+                    <h2>Create Organisation</h2>
+                    <form id="organisationForm" class="owner-form">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="organisationName">Organisation Name</label>
+                                <input type="text" id="organisationName" required placeholder="Enter organisation name">
+                            </div>
+                            <div class="form-group">
+                                <label for="organisationLicence">Licence Level</label>
+                                <select id="organisationLicence" required>
+                                    <option value="">Select licence level</option>
+                                    <option value="Level 1">Level 1</option>
+                                    <option value="Level 2">Level 2</option>
+                                    <option value="Level 3">Level 3</option>
+                                    <option value="Level 4">Level 4</option>
+                                    <option value="Level 5">Level 5</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="organisationManager">Assign Manager</label>
+                                <select id="organisationManager">
+                                    <option value="">Select manager</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="submit" class="btn-primary">Create Organisation</button>
+                        </div>
+                    </form>
+                </section>
+
+                <section style="margin-top: 30px;">
+                    <h2>My Organisations</h2>
+                    <div id="organisationList" class="organisation-list">
+                        <div class="loading">Loading organisations...</div>
+                    </div>
+                </section>
+
+                <section style="margin-top: 30px;">
+                    <h2>Owner Profile</h2>
+                    <p>The owner role is intended for organisation administrators that manage a school, club, or governing body.</p>
+                    <p>Only the owner can assign and approve managers for their organisation. Application managers have broader access beyond any single organisation.</p>
+                </section>
+            </div>
+        </main>
+        <div class="owner-footer" style="padding: 20px 0; text-align: center; color: #64748b;">Owner portal requires Cloudflare API deployment for full functionality.</div>
+    </div>
+    <script src="config.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/cloudflare-api.js"></script>
+    <script src="js/owner.js"></script>
+</body>
+</html>

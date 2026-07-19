@@ -9,8 +9,8 @@ class ProfileManager {
     }
 
     async init() {
-        if (!this.currentUser || this.currentUser.userType !== CONFIG.USER_TYPES.UMPIRE) {
-            showToast('Access denied. Umpires only.', 'error');
+        if (!this.currentUser) {
+            showToast('Please log in first.', 'error');
             window.location.href = 'index.html';
             return;
         }
@@ -22,23 +22,35 @@ class ProfileManager {
 
     loadUserProfile() {
         const name = this.currentUser.name || 'User';
-        const role = this.currentUser.userType === CONFIG.USER_TYPES.PLAYER ? 'Player' : 'Team Manager';
+        const role = CONFIG.ROLE_LABELS[this.currentUser.userType] || this.currentUser.userType;
 
         document.getElementById('profileName').textContent = name;
+        document.getElementById('profileRole').textContent = role;
         document.getElementById('firstName').value = name.split(' ')[0];
         document.getElementById('lastName').value = name.split(' ').slice(1).join(' ');
         document.getElementById('email').value = this.currentUser.email;
         document.getElementById('phone').value = this.currentUser.phone || '';
         document.getElementById('location').value = this.currentUser.location || '';
-        
-        // Show/hide player-specific or manager-specific fields
+
+        document.getElementById('playerFields').style.display = 'none';
+        document.getElementById('umpireFields').style.display = 'none';
+        document.getElementById('managerFields').style.display = 'none';
+
         if (this.currentUser.userType === CONFIG.USER_TYPES.PLAYER) {
             document.getElementById('playerFields').style.display = 'block';
-            document.getElementById('managerFields').style.display = 'none';
-        } else {
-            document.getElementById('playerFields').style.display = 'none';
+        } else if (this.currentUser.userType === CONFIG.USER_TYPES.UMPIRE) {
+            document.getElementById('umpireFields').style.display = 'block';
+        } else if (isAdminUser(this.currentUser) || this.currentUser.userType === CONFIG.USER_TYPES.MANAGER || this.currentUser.userType === CONFIG.USER_TYPES.OWNER || this.currentUser.userType === CONFIG.USER_TYPES.SAHA_REPRESENTATIVE || this.currentUser.userType === CONFIG.USER_TYPES.APPLICATION_MANAGER) {
             document.getElementById('managerFields').style.display = 'block';
         }
+
+        document.getElementById('preferredLocation').value = this.currentUser.preferredLocation || '';
+        document.getElementById('preferredMonths').value = this.currentUser.preferredMonths || '';
+        document.getElementById('preferredDays').value = this.currentUser.preferredDays || '';
+        document.getElementById('preferredTimes').value = this.currentUser.preferredTimes || '';
+        document.getElementById('preferredTeams').value = this.currentUser.preferredTeams || '';
+        document.getElementById('sahaLevel').value = this.currentUser.sahaLevel || '';
+        document.getElementById('managerTier').value = this.currentUser.roleTier || '';
     }
 
     async loadData() {
@@ -156,7 +168,14 @@ class ProfileManager {
         const updates = {
             name: `${document.getElementById('firstName').value} ${document.getElementById('lastName').value}`,
             phone: document.getElementById('phone').value,
-            location: document.getElementById('location').value
+            location: document.getElementById('location').value,
+            preferredLocation: document.getElementById('preferredLocation').value,
+            preferredMonths: document.getElementById('preferredMonths').value,
+            preferredDays: document.getElementById('preferredDays').value,
+            preferredTimes: document.getElementById('preferredTimes').value,
+            preferredTeams: document.getElementById('preferredTeams').value,
+            roleTier: document.getElementById('managerTier').value,
+            sahaLevel: document.getElementById('sahaLevel').value
         };
 
         try {

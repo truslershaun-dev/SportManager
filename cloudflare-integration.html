@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cloudflare Integration - Sport Manager</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2>Sport Manager</h2>
+            </div>
+            <nav class="sidebar-nav">
+                <ul>
+                    <li><a href="dashboard.html">Dashboard</a></li>
+                    <li><a href="matches.html">Matches</a></li>
+                    <li><a href="profile.html">Profile</a></li>
+                    <li><a href="cloudflare-integration.html" class="active">Cloudflare Setup</a></li>
+                </ul>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <header class="top-bar">
+                <h1>Cloudflare Hosting & Database Integration</h1>
+            </header>
+
+            <div class="profile-container">
+                <h2>Recommended architecture</h2>
+                <p>This site is now structured so the front end can be hosted as a static site on Cloudflare Pages while the data layer can be served from Cloudflare Workers + D1 or a managed database such as Cloudflare D1.</p>
+
+                <h3>1. Create the initial database schema</h3>
+                <ul>
+                    <li>users</li>
+                    <li>teams</li>
+                    <li>fields</li>
+                    <li>leagues_tournaments</li>
+                    <li>matches</li>
+                    <li>umpire_preferences</li>
+                    <li>notifications</li>
+                </ul>
+
+                <h3>2. Cloudflare deployment plan</h3>
+                <ol>
+                    <li>Deploy the static HTML/CSS/JS files to Cloudflare Pages.</li>
+                    <li>Create a Cloudflare Worker API for authentication, profile updates, match creation, and notifications.</li>
+                    <li>Store the application data in Cloudflare D1 or another Cloudflare-backed database.</li>
+                    <li>Use Cloudflare Turnstile or an internal auth layer for login if you want to move beyond the local demo storage.</li>
+                </ol>
+
+                <h3>3. Initial application manager account</h3>
+                <p>The first user should be created as Shaun with the application manager role so they can manage subscriptions, users, and system-wide access.</p>
+
+                <h3>4. Email notifications</h3>
+                <p>Each assignment, acceptance, decline, or new registration should trigger an email notification through Cloudflare Workers + an email provider such as Resend or SendGrid.</p>
+
+                <h3>5. Role-based workflow summary</h3>
+                <ul>
+                    <li>Umpires: capture availability, receive assignments, accept or decline games, and apply to open matches.</li>
+                    <li>Managers: create matches, select tournaments/leagues, assign preferred umpires, and record results.</li>
+                    <li>Owners: manage organisations, licences, sport/team limits, and manager access.</li>
+                    <li>SAHA Representatives: manage teams, fields, umpire levels, and league/tournament definitions.</li>
+                    <li>Application Managers: manage subscriptions and have unrestricted access.</li>
+                </ul>
+            </div>
+        </main>
+    </div>
+</body>
+</html>

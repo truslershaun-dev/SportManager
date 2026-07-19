@@ -126,6 +126,14 @@ function validatePassword(password) {
     return passwordRegex.test(password);
 }
 
+function isAdminUser(user = getCurrentUser()) {
+    return Boolean(user && [CONFIG.USER_TYPES.ADMIN, CONFIG.USER_TYPES.APPLICATION_MANAGER].includes(user.userType));
+}
+
+function canAccessOwnerPortal(user = getCurrentUser()) {
+    return Boolean(user && [CONFIG.USER_TYPES.OWNER, CONFIG.USER_TYPES.ADMIN, CONFIG.USER_TYPES.APPLICATION_MANAGER].includes(user.userType));
+}
+
 /**
  * Show toast notification
  */

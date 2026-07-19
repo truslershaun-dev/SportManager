@@ -197,6 +197,80 @@ SportManager/
      ```
    - Navigate to `http://localhost:8000`
 
+## Linking the New Database to the Pages
+
+Follow these steps to connect the Cloudflare D1 database to the website pages.
+
+1. Create the database in Cloudflare D1.
+   - Open the Cloudflare dashboard.
+   - Go to D1 and create a new database.
+   - Name it `sportsmanager_db`.
+
+2. Create the tables.
+   - Open the SQL editor for the new database.
+   - Paste the SQL from [cloudflare-d1-schema.md](cloudflare-d1-schema.md).
+   - Run the script to create all tables.
+
+3. Configure the Worker.
+   - Open [cloudflare-worker/wrangler.toml](cloudflare-worker/wrangler.toml).
+   - Make sure the D1 binding is present:
+     - `binding = "D1"`
+     - `database_name = "sportsmanager_db"`
+
+4. Deploy the Worker.
+   - Run `wrangler login`.
+   - Run `wrangler publish` from the [cloudflare-worker](cloudflare-worker) folder.
+
+5. Set the API URL in the frontend.
+   - Open [config.js](config.js).
+   - Set `CLOUDFLARE_API_URL` to the deployed Worker URL.
+
+6. Test the connection.
+   - Open the site and log in.
+   - Confirm the auth flow, owner portal, and data reads/writes work.
+
+7. Verify the pages are using the same backend.
+   - Ensure pages such as [dashboard.html](dashboard.html), [matches.html](matches.html), [profile.html](profile.html), and [owner.html](owner.html) are loading data through the same API endpoint.
+
+## Adding Pages Using GitHub
+
+Use these steps to add a new page to the project and publish it through GitHub.
+
+1. Create the new HTML file.
+   - Add the page to the project root, for example `new-page.html`.
+   - Include the shared layout, navigation, and styles.
+
+2. Link the page in the navigation.
+   - Update the sidebar links in the relevant HTML files.
+   - Add a link to the new page where needed.
+
+3. Create the page logic if needed.
+   - Add a matching JavaScript file in [js](js) if the page needs custom behavior.
+   - Connect it from the HTML file with a `<script>` tag.
+
+4. Commit the changes.
+   - Run:
+     ```bash
+     git add .
+     git commit -m "Add new page"
+     ```
+
+5. Push to GitHub.
+   - Run:
+     ```bash
+     git push origin main
+     ```
+
+6. Publish through GitHub Pages.
+   - Open the GitHub repository.
+   - Go to Settings → Pages.
+   - Select the branch to publish, usually `main`.
+   - Save the settings.
+
+7. Verify the published page.
+   - Open the GitHub Pages URL.
+   - Confirm the new page appears and works correctly.
+
 ## Usage
 
 ### First Time Setup

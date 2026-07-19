@@ -91,7 +91,7 @@ class TeamRegistrationManager {
         const teamManagerEmailInput = document.getElementById('teamManagerEmail');
         const teamLocationInput = document.getElementById('teamLocation');
 
-        if (this.currentUser.userType !== CONFIG.USER_TYPES.MANAGER) {
+        if (!isAdminUser(this.currentUser) && this.currentUser.userType !== CONFIG.USER_TYPES.MANAGER) {
             if (createTeamButton) {
                 createTeamButton.style.display = 'none';
             }
@@ -178,8 +178,8 @@ class TeamRegistrationManager {
     async handleRegisterTeam(e) {
         e.preventDefault();
 
-        if (this.currentUser.userType !== CONFIG.USER_TYPES.MANAGER) {
-            showToast('Only team managers can register new teams.', 'error');
+        if (!isAdminUser(this.currentUser) && this.currentUser.userType !== CONFIG.USER_TYPES.MANAGER) {
+            showToast('Only team managers and administrators can register new teams.', 'error');
             return;
         }
 

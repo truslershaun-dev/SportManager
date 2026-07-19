@@ -25,6 +25,8 @@
                     <li><a href="game-setup.html">Game Setup</a></li>
                     <li><a href="sport-registration.html">Sport Registration</a></li>
                     <li><a href="profile.html" class="active">Profile</a></li>
+                    <li><a href="owner.html">Owner Portal</a></li>
+                    <li><a href="cloudflare-integration.html">Cloudflare Setup</a></li>
                     <li class="admin-nav-link" style="display:none"><a href="users.html">User Management</a></li>
                     <li class="admin-nav-link" style="display:none"><a href="admin-test.html">Sheets Test</a></li>
                 </ul>
@@ -130,6 +132,41 @@
                             </div>
                         </div>
 
+                        <!-- Umpire-specific fields -->
+                        <div id="umpireFields" style="display: none;">
+                            <h3>Umpire Information</h3>
+
+                            <div class="form-group">
+                                <label for="preferredLocation">Preferred Location:</label>
+                                <input type="text" id="preferredLocation" disabled placeholder="Preferred area to umpire">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="preferredMonths">Preferred Months:</label>
+                                <input type="text" id="preferredMonths" disabled placeholder="e.g. Jan, Mar, Sep">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="preferredDays">Preferred Days:</label>
+                                <input type="text" id="preferredDays" disabled placeholder="e.g. Monday, Wednesday">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="preferredTimes">Preferred Times:</label>
+                                <input type="text" id="preferredTimes" disabled placeholder="e.g. morning, evening">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="preferredTeams">Preferred Teams:</label>
+                                <input type="text" id="preferredTeams" disabled placeholder="e.g. Team A, Team B">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="sahaLevel">SAHA Level:</label>
+                                <input type="text" id="sahaLevel" disabled placeholder="Set by SAHA representative">
+                            </div>
+                        </div>
+
                         <!-- Manager-specific fields -->
                         <div id="managerFields" style="display: none;">
                             <h3>Manager Information</h3>
@@ -154,6 +191,11 @@
                             <div class="form-group">
                                 <label for="bio">Biography:</label>
                                 <textarea id="bio" disabled placeholder="Tell us about yourself" rows="4"></textarea>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="managerTier">Manager Tier:</label>
+                                <input type="text" id="managerTier" disabled placeholder="Tier assigned to this profile">
                             </div>
                         </div>
 

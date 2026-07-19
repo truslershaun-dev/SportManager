@@ -16,8 +16,23 @@ class Dashboard {
      * Initialize dashboard
      */
     async init() {
-        if (!this.currentUser || this.currentUser.userType !== CONFIG.USER_TYPES.UMPIRE) {
-            showToast('Access denied. Umpires only.', 'error');
+        if (!this.currentUser) {
+            showToast('Please log in first.', 'error');
+            window.location.href = 'index.html';
+            return;
+        }
+
+        const allowedRoles = [
+            CONFIG.USER_TYPES.UMPIRE,
+            CONFIG.USER_TYPES.MANAGER,
+            CONFIG.USER_TYPES.OWNER,
+            CONFIG.USER_TYPES.SAHA_REPRESENTATIVE,
+            CONFIG.USER_TYPES.APPLICATION_MANAGER,
+            CONFIG.USER_TYPES.ADMIN
+        ];
+
+        if (!isAdminUser(this.currentUser) && !allowedRoles.includes(this.currentUser.userType)) {
+            showToast('Access denied for this role.', 'error');
             window.location.href = 'index.html';
             return;
         }
@@ -33,15 +48,20 @@ class Dashboard {
     setupUI() {
         const userName = document.getElementById('userName');
         const userDisplay = document.getElementById('userDisplay');
+        const userRoleBadge = document.getElementById('userRoleBadge');
         const welcomeMessage = document.getElementById('welcomeMessage');
         const profileName = document.getElementById('profileName');
 
         if (userName) userName.textContent = this.currentUser.name;
         if (userDisplay) userDisplay.textContent = this.currentUser.name;
+        if (userRoleBadge) {
+            const roleLabel = CONFIG.ROLE_LABELS[this.currentUser.userType] || this.currentUser.userType;
+            userRoleBadge.textContent = roleLabel;
+        }
         if (profileName) profileName.textContent = this.currentUser.name;
 
         // Show/hide role-specific sections
-        if (this.currentUser.userType === CONFIG.USER_TYPES.ADMIN) {
+        if (isAdminUser(this.currentUser)) {
             const managerSection = document.getElementById('managerStatsSection');
             if (managerSection) managerSection.style.display = 'block';
             
@@ -79,7 +99,7 @@ class Dashboard {
             // Load stats for managers and admins
             if (this.currentUser.userType === CONFIG.USER_TYPES.MANAGER) {
                 await this.loadManagerStats();
-            } else if (this.currentUser.userType === CONFIG.USER_TYPES.ADMIN) {
+            } else if (isAdminUser(this.currentUser)) {
                 await this.loadAdminStats();
             }
 
@@ -240,7 +260,7 @@ class Dashboard {
      * Initialize admin sheet test controls
      */
     initAdminSheetTestControls() {
-        if (this.currentUser.userType !== CONFIG.USER_TYPES.ADMIN) return;
+        if (!isAdminUser(this.currentUser)) return;
 
         const outputContainer = document.getElementById('sheetTestOutput');
         if (outputContainer) {

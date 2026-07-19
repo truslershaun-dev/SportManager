@@ -16,8 +16,23 @@ class MatchesManager {
      * Initialize matches manager
      */
     async init() {
-        if (!this.currentUser || this.currentUser.userType !== CONFIG.USER_TYPES.UMPIRE) {
-            showToast('Access denied. Umpires only.', 'error');
+        if (!this.currentUser) {
+            showToast('Please log in first.', 'error');
+            window.location.href = 'index.html';
+            return;
+        }
+
+        const allowedRoles = [
+            CONFIG.USER_TYPES.UMPIRE,
+            CONFIG.USER_TYPES.MANAGER,
+            CONFIG.USER_TYPES.OWNER,
+            CONFIG.USER_TYPES.SAHA_REPRESENTATIVE,
+            CONFIG.USER_TYPES.APPLICATION_MANAGER,
+            CONFIG.USER_TYPES.ADMIN
+        ];
+
+        if (!isAdminUser(this.currentUser) && !allowedRoles.includes(this.currentUser.userType)) {
+            showToast('Access denied for this role.', 'error');
             window.location.href = 'index.html';
             return;
         }
@@ -142,7 +157,7 @@ class MatchesManager {
     userCanSeeMatch(match) {
         if (!this.currentUser) return false;
 
-        if (this.currentUser.userType === CONFIG.USER_TYPES.ADMIN) {
+        if (isAdminUser(this.currentUser)) {
             return true;
         }
 
@@ -246,7 +261,7 @@ class MatchesManager {
         }
 
         const createMatchButton = document.getElementById('createMatchButton');
-        if (createMatchButton && this.currentUser.userType !== CONFIG.USER_TYPES.MANAGER) {
+        if (createMatchButton && !isAdminUser(this.currentUser) && this.currentUser.userType !== CONFIG.USER_TYPES.MANAGER) {
             createMatchButton.style.display = 'none';
         }
     }

@@ -23,6 +23,8 @@ const CONFIG = {
     APP_NAME: 'Sport Manager',
     APP_VERSION: '1.0.0',
     
+    CLOUDFLARE_API_URL: '',
+    
     // Date/Time Settings
     DATE_FORMAT: 'MMM DD, YYYY',
     TIME_FORMAT: 'hh:mm A',
@@ -32,8 +34,35 @@ const CONFIG = {
         PLAYER: 'player',
         MANAGER: 'manager',
         UMPIRE: 'umpire',
-        ADMIN: 'admin'
+        ADMIN: 'admin',
+        OWNER: 'owner',
+        SAHA_REPRESENTATIVE: 'saha_representative',
+        APPLICATION_MANAGER: 'application_manager'
     },
+
+    ROLE_LABELS: {
+        player: 'Player',
+        manager: 'Manager',
+        umpire: 'Umpire',
+        admin: 'Administrator',
+        owner: 'Organisation Owner',
+        saha_representative: 'SAHA Representative',
+        application_manager: 'Application Manager'
+    },
+
+    MANAGER_TIERS: {
+        TIER_1: 'Tier 1',
+        TIER_2: 'Tier 2',
+        TIER_3: 'Tier 3'
+    },
+
+    OWNER_LICENSE_LEVELS: [
+        { id: 'Level 1', sports: 1, teams: 5, description: '1 sport with up to 5 teams' },
+        { id: 'Level 2', sports: 5, teams: 5, description: '5 sports with up to 5 teams' },
+        { id: 'Level 3', sports: 10, teams: 20, description: '10 sports with up to 20 teams' },
+        { id: 'Level 4', sports: 10, teams: 'Unlimited', description: '10 sports with unlimited teams' },
+        { id: 'Level 5', sports: 'Unlimited', teams: 'Unlimited', description: 'Unlimited sports and unlimited teams' }
+    ],
 
     // Match Status
     MATCH_STATUS: {
@@ -102,14 +131,25 @@ function getCurrentUser() {
     return user ? JSON.parse(user) : null;
 }
 
-// Helper function to show or hide admin-only sidebar links
+// Helper function to show or hide role-based sidebar links
 function initializeAdminLinks() {
     const currentUser = getCurrentUser();
     const adminLinks = document.querySelectorAll('.admin-nav-link');
-    const shouldShow = currentUser && currentUser.userType === CONFIG.USER_TYPES.ADMIN;
+    const ownerPortalLinks = document.querySelectorAll('a[href="owner.html"], .owner-nav-link');
+    const canViewAdminLinks = isAdminUser(currentUser);
+    const canViewOwnerPortal = canAccessOwnerPortal(currentUser);
 
     adminLinks.forEach(link => {
-        link.style.display = shouldShow ? 'block' : 'none';
+        link.style.display = canViewAdminLinks ? 'block' : 'none';
+    });
+
+    ownerPortalLinks.forEach(link => {
+        const parent = link.closest('li');
+        if (parent) {
+            parent.style.display = canViewOwnerPortal ? 'block' : 'none';
+        } else {
+            link.style.display = canViewOwnerPortal ? 'block' : 'none';
+        }
     });
 }
 

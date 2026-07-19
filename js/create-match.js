@@ -18,8 +18,8 @@ class CreateMatchManager {
             return;
         }
 
-        if (this.currentUser.userType !== CONFIG.USER_TYPES.MANAGER) {
-            showToast('Only team managers can create matches.', 'error');
+        if (!isAdminUser(this.currentUser) && this.currentUser.userType !== CONFIG.USER_TYPES.MANAGER) {
+            showToast('Only team managers and administrators can create matches.', 'error');
             window.location.href = 'matches.html';
             return;
         }

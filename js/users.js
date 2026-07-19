@@ -10,7 +10,7 @@ async function initUsersPage() {
 
     await authManager.init();
 
-    if (currentUser.userType !== CONFIG.USER_TYPES.ADMIN) {
+    if (!isAdminUser(currentUser)) {
         showToast('Access denied. Admins only.', 'error');
         window.location.href = 'dashboard.html';
         return;

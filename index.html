@@ -23,24 +23,8 @@
                     <input type="password" id="password" name="password" required placeholder="Enter your password">
                 </div>
 
-                <div class="form-group">
-                    <label for="userType">User Type:</label>
-                    <select id="userType" name="userType" required>
-                        <option value="">Select User Type</option>
-                        <option value="manager">Team Manager</option>
-                        <option value="umpire">Umpire</option>
-                        <option value="admin">Admin</option>
-                    </select>
-                </div>
-
                 <button type="submit" class="btn-login">Login</button>
             </form>
-
-            <div class="auth-divider">OR</div>
-
-            <button id="googleLoginBtn" class="btn-google">
-                <span>Sign in with Google</span>
-            </button>
 
             <p class="signup-link">Don't have an account? <a href="#" onclick="toggleSignup()">Sign up here</a></p>
         </div>
@@ -67,10 +51,12 @@
                 <div class="form-group">
                     <label for="signupUserType">User Type:</label>
                     <select id="signupUserType" name="userType" required>
-                        <option value="">Select User Type</option>
-                        <option value="manager">Team Manager</option>
                         <option value="umpire">Umpire</option>
                     </select>
+                </div>
+
+                <div class="signup-note">
+                    <p>Only umpires may self-register. All other account types must be created by an organisation owner.</p>
                 </div>
 
                 <button type="submit" class="btn-login">Create Account</button>
@@ -79,10 +65,10 @@
         </div>
     </div>
 
-    <script src="https://accounts.google.com/gsi/client" async defer></script>
     <script src="config.js"></script>
     <script src="js/utils.js"></script>
     <script src="js/google-sheets-api.js"></script>
+    <script src="js/cloudflare-api.js"></script>
     <script src="js/auth.js"></script>
 </body>
 </html>

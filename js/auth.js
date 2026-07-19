@@ -5,7 +5,7 @@ class AuthManager {
         this.users = [];
         this.currentUser = getCurrentUser();
         
-        // Add hardcoded admin account for testing
+        // Seed the initial admin account for the Cloudflare deployment
         const adminPassword = this.hashPassword('Admin@12345');
         this.users.push({
             id: 'admin-001',
@@ -38,7 +38,7 @@ class AuthManager {
                     createdAt: row[6]
                 }));
                 
-                // Merge sheet users with admin account (admin account always available)
+                // Merge sheet users with seeded admin account
                 const adminUser = this.users.find(u => u.email === 'admin@sportmanager.com');
                 this.users = [...sheetUsers];
                 if (adminUser) {
@@ -54,11 +54,11 @@ class AuthManager {
     /**
      * Register new user
      */
-    async register(email, password, name, userType) {
-        return this.createUser(email, password, name, userType, false);
+    async register(email, password, name, userType, roleTier = '') {
+        return this.createUser(email, password, name, userType, false, roleTier);
     }
 
-    async createUser(email, password, name, userType, allowAdmin = false) {
+    async createUser(email, password, name, userType, allowAdmin = false, roleTier = '') {
         // Validate inputs
         if (!validateEmail(email)) {
             throw new Error('Invalid email address');
@@ -72,8 +72,8 @@ class AuthManager {
             throw new Error('Name and user type are required');
         }
 
-        if (userType === CONFIG.USER_TYPES.ADMIN && !allowAdmin) {
-            throw new Error('Admin users can only be created by another admin');
+        if ((userType === CONFIG.USER_TYPES.ADMIN || userType === CONFIG.USER_TYPES.APPLICATION_MANAGER) && !allowAdmin) {
+            throw new Error('This role can only be created by an application manager');
         }
 
         // Check if user already exists
@@ -91,7 +91,8 @@ class AuthManager {
             userType: userType,
             phone: '',
             location: '',
-            createdAt: new Date().toISOString()
+            createdAt: new Date().toISOString(),
+            roleTier: roleTier || ''
         };
 
         // Save to sheets
@@ -103,7 +104,8 @@ class AuthManager {
                 userType,
                 '',
                 '',
-                new Date().toISOString()
+                new Date().toISOString(),
+                roleTier || ''
             ]);
 
             this.users.push(newUser);
@@ -114,8 +116,8 @@ class AuthManager {
         }
     }
 
-    async createUserAdmin(email, password, name, userType) {
-        return this.createUser(email, password, name, userType, true);
+    async createUserAdmin(email, password, name, userType, roleTier = '') {
+        return this.createUser(email, password, name, userType, true, roleTier);
     }
 
     /**
@@ -131,11 +133,11 @@ class AuthManager {
             throw new Error('Password is required');
         }
 
-        // Find user
-        const user = this.users.find(u => u.email === email && u.userType === userType);
+        // Find user by email and derive the role from the stored account
+        const user = this.users.find(u => u.email === email);
 
         if (!user) {
-            throw new Error('Invalid email or user type');
+            throw new Error('Invalid email');
         }
 
         // Check password (in production, this should be verified on server)
@@ -272,11 +274,17 @@ if (loginForm) {
 
         const email = document.getElementById('email').value;
         const password = document.getElementById('password').value;
-        const userType = document.getElementById('userType').value;
 
         try {
             showLoading();
-            await authManager.login(email, password, userType);
+            if (cfApi.isEnabled()) {
+                const result = await cfApi.login(email, password);
+                const user = result.user;
+                setCurrentUser(user);
+                setAuthToken(generateId());
+            } else {
+                await authManager.login(email, password);
+            }
             showToast('Login successful!', 'success');
             
             // Redirect to dashboard
@@ -301,10 +309,21 @@ if (signupForm) {
         const email = document.getElementById('signupEmail').value;
         const password = document.getElementById('signupPassword').value;
         const userType = document.getElementById('signupUserType').value;
+        const roleTier = '';
+
+        if (userType !== CONFIG.USER_TYPES.UMPIRE) {
+            showToast('Only umpires may self-register. All other accounts must be created by an owner.', 'error');
+            hideLoading();
+            return;
+        }
 
         try {
             showLoading();
-            await authManager.register(email, password, name, userType);
+            if (cfApi.isEnabled()) {
+                await cfApi.register(email, password, name, userType, roleTier);
+            } else {
+                await authManager.register(email, password, name, userType, roleTier);
+            }
             showToast('Account created successfully! Please log in.', 'success');
             
             // Switch to login form
@@ -336,26 +355,5 @@ function toggleSignup() {
     }
 }
 
-// Google Sign-In callback (optional integration)
-function onGoogleSuccess(response) {
-    const token = response.credential;
-    console.log('Google token:', token);
-    
-    // In a real app, you would send this token to your backend for verification
-    // For now, we'll just show a message
-    showToast('Google Sign-In not fully configured yet. Please use regular login.', 'info');
-}
-
-// Initialize Google Sign-In button if available
-window.onload = function() {
-    const googleButton = document.getElementById('googleLoginBtn');
-    if (googleButton) {
-        googleButton.addEventListener('click', () => {
-            showToast('Google Sign-In integration coming soon!', 'info');
-        });
-    }
-};
-
 // Make auth functions globally available
 window.toggleSignup = toggleSignup;
-window.onGoogleSuccess = onGoogleSuccess;
