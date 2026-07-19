@@ -218,8 +218,22 @@ Follow these steps to connect the Cloudflare D1 database to the website pages.
      - `database_name = "sportsmanager_db"`
 
 4. Deploy the Worker.
-   - Run `wrangler login`.
-   - Run `wrangler publish` from the [cloudflare-worker](cloudflare-worker) folder.
+   - From the [cloudflare-worker](cloudflare-worker) folder, install dependencies:
+     ```bash
+     npm install
+     ```
+   - Sign in to Cloudflare:
+     ```bash
+     npm run login
+     ```
+   - Upload/deploy the Worker:
+     ```bash
+     npm run deploy
+     ```
+   - If you prefer the raw Wrangler command, run:
+     ```bash
+     npx wrangler deploy
+     ```
 
 5. Set the API URL in the frontend.
    - Open [config.js](config.js).

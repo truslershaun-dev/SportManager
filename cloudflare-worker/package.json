@@ -1,0 +1,15 @@
+{
+  "name": "sportmanager-api",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Cloudflare Worker API for Sport Manager",
+  "scripts": {
+    "login": "wrangler login",
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "tail": "wrangler tail"
+  },
+  "devDependencies": {
+    "wrangler": "^4.25.0"
+  }
+}
