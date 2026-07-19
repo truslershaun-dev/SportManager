@@ -1,0 +1,42 @@
+name: Deploy Cloudflare Worker
+
+on:
+  push:
+    branches:
+      - main
+      - master
+    paths:
+      - 'cloudflare-worker/**'
+      - '.github/workflows/deploy-worker.yml'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        working-directory: cloudflare-worker
+        run: npm install
+
+      - name: Deploy Worker to Cloudflare
+        working-directory: cloudflare-worker
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: npm run deploy
+
+      - name: Notify deployment
+        if: success()
+        run: echo "✅ Cloudflare Worker deployed successfully!"
+
+      - name: Notify deployment failure
+        if: failure()
+        run: echo "❌ Cloudflare Worker deployment failed. Check logs above."

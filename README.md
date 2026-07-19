@@ -235,15 +235,25 @@ Follow these steps to connect the Cloudflare D1 database to the website pages.
      npx wrangler deploy
      ```
 
-5. Set the API URL in the frontend.
+5. **(Optional) Set up automatic GitHub deployment.**
+   - Create a Cloudflare API token:
+     - Go to [Cloudflare Dashboard](https://dash.cloudflare.com) → My Profile → API Tokens.
+     - Create a token with Worker permissions (Edit Cloudflare Workers, Read Account Settings).
+   - Add secrets to GitHub:
+     - Go to your GitHub repo → Settings → Secrets and variables → Actions.
+     - Add `CLOUDFLARE_API_TOKEN` with your Cloudflare API token.
+     - Add `CLOUDFLARE_ACCOUNT_ID` with your Cloudflare Account ID (found in the dashboard).
+   - The workflow [.github/workflows/deploy-worker.yml](.github/workflows/deploy-worker.yml) will now automatically deploy on every push to `main` or `master`.
+
+6. Set the API URL in the frontend.
    - Open [config.js](config.js).
    - Set `CLOUDFLARE_API_URL` to the deployed Worker URL.
 
-6. Test the connection.
+7. Test the connection.
    - Open the site and log in.
    - Confirm the auth flow, owner portal, and data reads/writes work.
 
-7. Verify the pages are using the same backend.
+8. Verify the pages are using the same backend.
    - Ensure pages such as [dashboard.html](dashboard.html), [matches.html](matches.html), [profile.html](profile.html), and [owner.html](owner.html) are loading data through the same API endpoint.
 
 ## Adding Pages Using GitHub
