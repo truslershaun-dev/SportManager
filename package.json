@@ -3,7 +3,11 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
+    "build": "echo \"No build step required for the static Pages site\"",
     "deploy:pages": "wrangler pages deploy . --project-name=sportmanager"
+  },
+  "dependencies": {
+    "itty-router": "^1.0.0"
   },
   "devDependencies": {
     "wrangler": "^4.25.0"
