@@ -6,13 +6,13 @@ env = "production"
 
 [vars]
 # These values should be set in Cloudflare dashboard or via Wrangler environment variables.
-DATABASE = "sportsmanager_db"
+DATABASE = "sportmanager_db"
 EMAIL_API_KEY = ""
 EMAIL_API_URL = ""
 
 [[d1_databases]]
 binding = "D1"
-database_name = "sportsmanager_db"
+database_name = "sportmanager_db"
 
 [triggers]
 crons = ["0 */6 * * *"]
