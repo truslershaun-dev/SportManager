@@ -134,24 +134,29 @@ function getCurrentUser() {
 }
 
 // Helper function to show or hide role-based sidebar links
+//
+// Sidebar <li> elements can carry a data-roles="admin,manager,..." attribute
+// (values match CONFIG.USER_TYPES) listing which roles may see that link.
+// A link with no data-roles attribute is always shown to any logged-in user
+// (e.g. Dashboard, Matches, Profile). This replaces the old logic, which only
+// ever hid the "User Management" and "Owner Portal" links and left every
+// other tab (Umpires, Team Registration, Game Setup, Sport Registration,
+// Cloudflare Setup) visible to every role, including umpires and players.
 function initializeAdminLinks() {
+    applyRoleBasedNav();
+}
+
+function applyRoleBasedNav() {
     const currentUser = getCurrentUser();
-    const adminLinks = document.querySelectorAll('.admin-nav-link');
-    const ownerPortalLinks = document.querySelectorAll('a[href="owner.html"], .owner-nav-link');
-    const canViewAdminLinks = isAdminUser(currentUser);
-    const canViewOwnerPortal = canAccessOwnerPortal(currentUser);
+    const restrictedLinks = document.querySelectorAll('.sidebar-nav li[data-roles]');
 
-    adminLinks.forEach(link => {
-        link.style.display = canViewAdminLinks ? 'block' : 'none';
-    });
-
-    ownerPortalLinks.forEach(link => {
-        const parent = link.closest('li');
-        if (parent) {
-            parent.style.display = canViewOwnerPortal ? 'block' : 'none';
-        } else {
-            link.style.display = canViewOwnerPortal ? 'block' : 'none';
-        }
+    restrictedLinks.forEach(li => {
+        const allowedRoles = (li.getAttribute('data-roles') || '')
+            .split(',')
+            .map(role => role.trim())
+            .filter(Boolean);
+        const canView = Boolean(currentUser && allowedRoles.includes(currentUser.userType));
+        li.style.display = canView ? '' : 'none';
     });
 }
 

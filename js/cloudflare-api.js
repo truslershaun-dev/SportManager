@@ -26,8 +26,30 @@ class CloudflareApiClient {
             options.body = JSON.stringify(body);
         }
 
-        const response = await fetch(url, options);
-        const data = await response.json();
+        let response;
+        try {
+            response = await fetch(url, options);
+        } catch (networkError) {
+            // The request never reached a server that could respond (offline,
+            // DNS failure, CORS, etc.) - this means the backend isn't actually
+            // reachable, not that the user's request was invalid.
+            const error = new Error('Could not reach the Cloudflare API');
+            error.backendUnavailable = true;
+            throw error;
+        }
+
+        let data;
+        try {
+            data = await response.json();
+        } catch (parseError) {
+            // The response wasn't JSON at all (e.g. a 404/501 HTML error page
+            // from a misconfigured or undeployed API route). Treat this as
+            // "the backend isn't working" rather than a real application error,
+            // so callers can fall back instead of showing a raw parse error.
+            const error = new Error('The Cloudflare API returned an unexpected response');
+            error.backendUnavailable = true;
+            throw error;
+        }
 
         if (!response.ok) {
             const message = data?.error || `API request failed with status ${response.status}`;
@@ -51,6 +73,10 @@ class CloudflareApiClient {
 
     async updateUser(userId, updates) {
         return this.request('PUT', `/users/${encodeURIComponent(userId)}`, updates);
+    }
+
+    async deleteUser(userId) {
+        return this.request('DELETE', `/users/${encodeURIComponent(userId)}`);
     }
 
     async getOrganisations(ownerId) {

@@ -376,7 +376,7 @@ CREATE TABLE audit_trails (
 ## Cloudflare D1 Setup Steps
 
 1. Install Wrangler or use Cloudflare dashboard.
-2. Create a new D1 database in Cloudflare named `sportsmanager_db`.
+2. Create a new D1 database in Cloudflare named `sportmanager_db`.
 3. Connect your Worker to the D1 database variable `D1`.
 4. Run the schema SQL under the Cloudflare D1 UI or via Wrangler.
 
@@ -385,11 +385,26 @@ CREATE TABLE audit_trails (
 ```bash
 npm install -g wrangler
 wrangler login
-wrangler d1 create sportsmanager_db
-wrangler d1 migrations apply --database sportsmanager_db
+wrangler d1 create sportmanager_db
+# Copy the database_id this prints into wrangler.toml (and
+# cloudflare-worker/wrangler.toml, if you're also deploying the standalone
+# Worker) before continuing.
+
+# Apply the schema (cloudflare-worker/src/schema.sql has the full CREATE
+# TABLE statements - there is no migrations/ folder in this project, so
+# `wrangler d1 migrations apply` does not apply here):
+wrangler d1 execute sportmanager_db --remote --file=./cloudflare-worker/src/schema.sql
+
+# Seed the demo admin account (see db-seed-admin.sql at the repo root):
+wrangler d1 execute sportmanager_db --remote --file=./db-seed-admin.sql
+
 wrangler secret put EMAIL_API_KEY
 wrangler secret put EMAIL_API_URL
-wrangler publish --env production
+
+# Deploy the Pages site + Functions (this is the primary deployment path -
+# it serves the static frontend AND /api/* from functions/api/[[path]].js
+# in one deploy):
+wrangler pages deploy . --project-name=sportmanager
 ```
 
 > If you prefer Cloudflare dashboard setup, skip the `wrangler d1 create` and use the dashboard to create the D1 database. Then add the same binding in `wrangler.toml`.

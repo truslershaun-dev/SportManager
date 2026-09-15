@@ -23,6 +23,7 @@ class Dashboard {
         }
 
         const allowedRoles = [
+            CONFIG.USER_TYPES.PLAYER,
             CONFIG.USER_TYPES.UMPIRE,
             CONFIG.USER_TYPES.MANAGER,
             CONFIG.USER_TYPES.OWNER,
@@ -92,10 +93,12 @@ class Dashboard {
      */
     async loadData() {
         try {
-            // Load matches (use Sheets if available)
+            // Load matches (use Sheets if available, otherwise fall back to localStorage)
             let matchesData = [];
             if (typeof sheetsAPI !== 'undefined' && sheetsAPI) {
                 matchesData = await sheetsAPI.readSheet(CONFIG.SHEETS.MATCHES);
+            } else {
+                matchesData = JSON.parse(localStorage.getItem('sheet_' + (CONFIG.SHEETS.MATCHES || 'MATCHES')) || '[]');
             }
             await this.processMatches(matchesData);
 
@@ -165,6 +168,8 @@ class Dashboard {
             let teamsData = [];
             if (typeof sheetsAPI !== 'undefined' && sheetsAPI) {
                 teamsData = await sheetsAPI.readSheet(CONFIG.SHEETS.TEAMS);
+            } else {
+                teamsData = JSON.parse(localStorage.getItem('sheet_' + (CONFIG.SHEETS.TEAMS || 'TEAMS')) || '[]');
             }
             if (teamsData && teamsData.length > 1) {
                 this.stats.registeredTeams = teamsData.length - 1;
@@ -174,6 +179,8 @@ class Dashboard {
             let umpiresData = [];
             if (typeof sheetsAPI !== 'undefined' && sheetsAPI) {
                 umpiresData = await sheetsAPI.readSheet(CONFIG.SHEETS.UMPIRES);
+            } else {
+                umpiresData = JSON.parse(localStorage.getItem('sheet_' + (CONFIG.SHEETS.UMPIRES || 'UMPIRES')) || '[]');
             }
             if (umpiresData && umpiresData.length > 1) {
                 this.stats.availableUmpires = umpiresData.length - 1;
@@ -194,6 +201,8 @@ class Dashboard {
             let teamsData = [];
             if (typeof sheetsAPI !== 'undefined' && sheetsAPI) {
                 teamsData = await sheetsAPI.readSheet(CONFIG.SHEETS.TEAMS);
+            } else {
+                teamsData = JSON.parse(localStorage.getItem('sheet_' + (CONFIG.SHEETS.TEAMS || 'TEAMS')) || '[]');
             }
             if (teamsData && teamsData.length > 1) {
                 this.stats.registeredTeams = teamsData.length - 1;
@@ -204,6 +213,8 @@ class Dashboard {
             let umpiresData = [];
             if (typeof sheetsAPI !== 'undefined' && sheetsAPI) {
                 umpiresData = await sheetsAPI.readSheet(CONFIG.SHEETS.UMPIRES);
+            } else {
+                umpiresData = JSON.parse(localStorage.getItem('sheet_' + (CONFIG.SHEETS.UMPIRES || 'UMPIRES')) || '[]');
             }
             if (umpiresData && umpiresData.length > 1) {
                 this.stats.availableUmpires = umpiresData.length - 1;

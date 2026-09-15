@@ -20,14 +20,14 @@
                 <ul>
                     <li><a href="dashboard.html">Dashboard</a></li>
                     <li><a href="matches.html">Matches</a></li>
-                    <li><a href="umpires.html">Umpires</a></li>
-                    <li><a href="team-registration.html">Team Registration</a></li>
-                    <li><a href="game-setup.html">Game Setup</a></li>
-                    <li><a href="sport-registration.html">Sport Registration</a></li>
+                    <li data-roles="admin,owner,saha_representative,application_manager"><a href="umpires.html">Umpires</a></li>
+                    <li data-roles="admin,manager,owner,application_manager"><a href="team-registration.html">Team Registration</a></li>
+                    <li data-roles="admin,owner,application_manager"><a href="game-setup.html">Game Setup</a></li>
+                    <li data-roles="admin,owner,application_manager"><a href="sport-registration.html">Sport Registration</a></li>
                     <li><a href="profile.html" class="active">Profile</a></li>
-                    <li><a href="owner.html">Owner Portal</a></li>
-                    <li><a href="cloudflare-integration.html">Cloudflare Setup</a></li>
-                    <li class="admin-nav-link" style="display:none"><a href="users.html">User Management</a></li>
+                    <li data-roles="owner,admin,application_manager"><a href="owner.html">Owner Portal</a></li>
+                    <li data-roles="admin,application_manager"><a href="cloudflare-integration.html">Cloudflare Setup</a></li>
+                    <li class="admin-nav-link" style="display:none" data-roles="admin,application_manager"><a href="users.html">User Management</a></li>
                 </ul>
             </nav>
 
@@ -285,6 +285,8 @@
 
     <script src="config.js"></script>
     <script src="js/utils.js"></script>
+    <script src="js/cloudflare-api.js"></script>
+    <script src="js/auth.js"></script>
     <script src="js/profile.js"></script>
 </body>
 </html>

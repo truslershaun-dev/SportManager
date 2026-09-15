@@ -23,6 +23,7 @@ class MatchesManager {
         }
 
         const allowedRoles = [
+            CONFIG.USER_TYPES.PLAYER,
             CONFIG.USER_TYPES.UMPIRE,
             CONFIG.USER_TYPES.MANAGER,
             CONFIG.USER_TYPES.OWNER,

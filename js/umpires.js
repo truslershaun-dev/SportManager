@@ -19,6 +19,22 @@ class UmpiresManager {
             return;
         }
 
+        // Umpire management is an organisation-level function, not something
+        // umpires or team managers need - umpires should only see their own
+        // Dashboard/Profile/Matches, and managers only assign umpires that
+        // already exist (from the Matches screen).
+        const allowedRoles = [
+            CONFIG.USER_TYPES.OWNER,
+            CONFIG.USER_TYPES.SAHA_REPRESENTATIVE,
+            CONFIG.USER_TYPES.APPLICATION_MANAGER,
+            CONFIG.USER_TYPES.ADMIN
+        ];
+        if (!isAdminUser(this.currentUser) && !allowedRoles.includes(this.currentUser.userType)) {
+            showToast('You do not have access to Umpire Management', 'error');
+            window.location.href = 'dashboard.html';
+            return;
+        }
+
         await this.loadData();
         this.setupEventListeners();
         this.loadUmpires();

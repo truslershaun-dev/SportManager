@@ -204,7 +204,7 @@ Follow these steps to connect the Cloudflare D1 database to the website pages.
 1. Create the database in Cloudflare D1.
    - Open the Cloudflare dashboard.
    - Go to D1 and create a new database.
-   - Name it `sportsmanager_db`.
+   - Name it `sportmanager_db`.
 
 2. Create the tables.
    - Open the SQL editor for the new database.
@@ -215,7 +215,7 @@ Follow these steps to connect the Cloudflare D1 database to the website pages.
    - Open [cloudflare-worker/wrangler.toml](cloudflare-worker/wrangler.toml).
    - Make sure the D1 binding is present:
      - `binding = "D1"`
-     - `database_name = "sportsmanager_db"`
+     - `database_name = "sportmanager_db"`
 
 4. Deploy the Worker.
    - From the [cloudflare-worker](cloudflare-worker) folder, install dependencies:

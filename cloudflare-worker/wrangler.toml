@@ -13,6 +13,10 @@ EMAIL_API_URL = ""
 [[d1_databases]]
 binding = "D1"
 database_name = "sportmanager_db"
+# See root wrangler.toml - database_id is required for the D1 binding to
+# actually resolve. Use the same id here as the Pages project so both
+# deployment paths talk to the same database.
+database_id = "REPLACE_WITH_DATABASE_ID_FROM_WRANGLER_D1_CREATE"
 
 [triggers]
 crons = ["0 */6 * * *"]

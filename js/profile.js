@@ -191,7 +191,31 @@ class ProfileManager {
         try {
             showLoading();
 
-            await authManager.updateProfile(this.currentUser.id, updates);
+            if (cfApi.isEnabled()) {
+                try {
+                    await cfApi.updateUser(this.currentUser.id, {
+                        name: updates.name,
+                        phone: updates.phone,
+                        location: updates.location,
+                        role_tier: updates.roleTier,
+                        preferred_location: updates.preferredLocation,
+                        preferred_months: updates.preferredMonths,
+                        preferred_days: updates.preferredDays,
+                        preferred_times: updates.preferredTimes,
+                        preferred_teams: updates.preferredTeams,
+                        saha_level: updates.sahaLevel
+                    });
+                } catch (apiError) {
+                    if (apiError.backendUnavailable) {
+                        console.warn('Cloudflare API unavailable, falling back to local profile storage:', apiError.message);
+                        await authManager.updateProfile(this.currentUser.id, updates);
+                    } else {
+                        throw apiError;
+                    }
+                }
+            } else {
+                await authManager.updateProfile(this.currentUser.id, updates);
+            }
 
             this.currentUser = { ...this.currentUser, ...updates };
             setCurrentUser(this.currentUser);
@@ -270,10 +294,33 @@ class ProfileManager {
             return;
         }
 
+        if (!validatePassword(newPassword)) {
+            showToast('New password must be at least 8 characters with uppercase, lowercase, and number', 'error');
+            return;
+        }
+
         try {
             showLoading();
 
-            await authManager.changePassword(this.currentUser.id, currentPassword, newPassword);
+            if (cfApi.isEnabled()) {
+                try {
+                    // The update endpoint overwrites the password unconditionally,
+                    // so verify the current one first by attempting a login.
+                    await cfApi.login(this.currentUser.email, currentPassword);
+                    await cfApi.updateUser(this.currentUser.id, { password: newPassword });
+                } catch (apiError) {
+                    if (apiError.backendUnavailable) {
+                        console.warn('Cloudflare API unavailable, falling back to local auth:', apiError.message);
+                        await authManager.changePassword(this.currentUser.id, currentPassword, newPassword);
+                    } else if (apiError.message === 'Invalid credentials') {
+                        throw new Error('Current password is incorrect');
+                    } else {
+                        throw apiError;
+                    }
+                }
+            } else {
+                await authManager.changePassword(this.currentUser.id, currentPassword, newPassword);
+            }
 
             showToast('Password changed successfully!', 'success');
             this.closeChangePasswordModal();
@@ -301,7 +348,20 @@ class ProfileManager {
         try {
             showLoading();
 
-            await authManager.deleteAccount(this.currentUser.id);
+            if (cfApi.isEnabled()) {
+                try {
+                    await cfApi.deleteUser(this.currentUser.id);
+                } catch (apiError) {
+                    if (apiError.backendUnavailable) {
+                        console.warn('Cloudflare API unavailable, falling back to local auth:', apiError.message);
+                        await authManager.deleteAccount(this.currentUser.id);
+                    } else {
+                        throw apiError;
+                    }
+                }
+            } else {
+                await authManager.deleteAccount(this.currentUser.id);
+            }
 
             showToast('Account deleted successfully!', 'success');
             setTimeout(() => {

@@ -258,16 +258,31 @@ if (loginForm) {
 
         try {
             showLoading();
+
             if (cfApi.isEnabled()) {
-                const result = await cfApi.login(email, password);
-                const user = result.user;
-                setCurrentUser(user);
-                setAuthToken(generateId());
+                try {
+                    const result = await cfApi.login(email, password);
+                    setCurrentUser(result.user);
+                    setAuthToken(generateId());
+                } catch (apiError) {
+                    if (apiError.backendUnavailable) {
+                        // The Cloudflare API isn't actually deployed/reachable -
+                        // fall back to the local demo auth instead of leaving
+                        // the user stuck on the login page with no feedback.
+                        console.warn('Cloudflare API unavailable, falling back to local auth:', apiError.message);
+                        await authManager.login(email, password);
+                    } else {
+                        // The backend responded - this is a real login failure
+                        // (e.g. wrong password), so surface it as-is.
+                        throw apiError;
+                    }
+                }
             } else {
                 await authManager.login(email, password);
             }
+
             showToast('Login successful!', 'success');
-            
+
             // Redirect to dashboard
             setTimeout(() => {
                 window.location.href = 'dashboard.html';
@@ -301,7 +316,16 @@ if (signupForm) {
         try {
             showLoading();
             if (cfApi.isEnabled()) {
-                await cfApi.register(email, password, name, userType, roleTier);
+                try {
+                    await cfApi.register(email, password, name, userType, roleTier);
+                } catch (apiError) {
+                    if (apiError.backendUnavailable) {
+                        console.warn('Cloudflare API unavailable, falling back to local auth:', apiError.message);
+                        await authManager.register(email, password, name, userType, roleTier);
+                    } else {
+                        throw apiError;
+                    }
+                }
             } else {
                 await authManager.register(email, password, name, userType, roleTier);
             }

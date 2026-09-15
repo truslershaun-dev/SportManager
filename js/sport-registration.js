@@ -13,6 +13,19 @@ class SportRegistrationManager {
             return;
         }
 
+        // Sport configuration is an organisation-level function, not a
+        // manager or umpire task.
+        const allowedRoles = [
+            CONFIG.USER_TYPES.OWNER,
+            CONFIG.USER_TYPES.APPLICATION_MANAGER,
+            CONFIG.USER_TYPES.ADMIN
+        ];
+        if (!isAdminUser(this.currentUser) && !allowedRoles.includes(this.currentUser.userType)) {
+            showToast('You do not have access to Sport Registration', 'error');
+            window.location.href = 'dashboard.html';
+            return;
+        }
+
         await this.loadData();
         this.loadSports();
         this.setupEventListeners();

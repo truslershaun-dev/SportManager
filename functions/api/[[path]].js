@@ -1,3 +1,11 @@
+// Cloudflare Pages Function — handles every request under /api/*
+//
+// IMPORTANT: files under /functions must export onRequest / onRequestGet /
+// onRequestPost handlers (Pages Functions routing), NOT a Worker-style
+// `export default { fetch(request, env) }`. The old functions/api.js used
+// the Worker export shape, which Pages silently ignores — every /api/*
+// call 404'd. The [[path]].js filename is Pages' "match everything under
+// this folder" convention, equivalent to a wildcard route.
 import { Router } from 'itty-router';
 
 const router = Router();
@@ -14,7 +22,7 @@ const handleServerError = (message) => jsonResponse({ error: message }, 500);
 
 const validateEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
-// --- Password hashing (PBKDF2-SHA256 via Web Crypto, built into the Workers runtime) ---
+// --- Password hashing (PBKDF2-SHA256 via Web Crypto, built into the Workers/Pages runtime) ---
 const PBKDF2_ITERATIONS = 100000;
 
 const toHex = (buf) => Array.from(new Uint8Array(buf)).map((b) => b.toString(16).padStart(2, '0')).join('');
@@ -45,13 +53,8 @@ async function verifyPassword(password, stored) {
   return toHex(derivedBits) === hashHex;
 }
 
-// NOTE: `env` (which carries the D1 binding, EMAIL_API_KEY, etc.) is only
-// ever available as the second argument to fetch(request, env, ctx) in a
-// Worker. The previous version of this file referenced bare `D1`,
-// `EMAIL_API_KEY` and `EMAIL_API_URL` globals that don't exist in the
-// Workers runtime, so every route that touched the database threw a
-// ReferenceError. env is now threaded through every handler below.
 const dbQuery = async (query, params = [], env) => {
+  // D1 binding is available on env for Pages Functions
   const conn = env.D1.prepare(query);
   const result = await conn.bind(...params).all();
   return result;
@@ -113,11 +116,7 @@ const sendEmailNotification = async (to, subject, message, env) => {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${EMAIL_API_KEY}`
     },
-    body: JSON.stringify({
-      to,
-      subject,
-      text: message
-    })
+    body: JSON.stringify({ to, subject, text: message })
   });
 };
 
@@ -316,12 +315,17 @@ router.get('/healthchecks/expired-assignments', async (_req, env) => {
 
 router.all('*', () => handleNotFound('Route not found'));
 
-export default {
-  async fetch(request, env, ctx) {
-    try {
-      return await router.handle(request, env, ctx);
-    } catch (err) {
-      return handleServerError(err.message || 'Internal error');
-    }
+export async function onRequest(context) {
+  const { request, env } = context;
+  try {
+    const url = new URL(request.url);
+    const normalizedPath = url.pathname.startsWith('/api')
+      ? url.pathname.slice('/api'.length) || '/'
+      : url.pathname;
+    const rewrittenUrl = `${url.origin}${normalizedPath}${url.search}`;
+    const normalizedRequest = new Request(request, { url: rewrittenUrl });
+    return await router.handle(normalizedRequest, env);
+  } catch (err) {
+    return handleServerError(err.message || 'Internal error');
   }
-};
+}
